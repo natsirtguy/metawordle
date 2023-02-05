@@ -53,7 +53,10 @@ function purpleInner(letter, wordIdx, letterIdx, yoursArray, answer) {
       yourLetterIdx < yoursArray[yourWordIdx].length;
       yourLetterIdx++
     ) {
-      if (letter === yoursArray[yourWordIdx][yourLetterIdx]) {
+      if (
+	(letter === yoursArray[yourWordIdx][yourLetterIdx])
+	  && (answer[wordIdx][letterIdx] === "⬛")
+      ) {
 	answer[wordIdx][letterIdx] = "🟪";
 	yoursArray[yourWordIdx][yourLetterIdx] = null;
 	return [answer, yoursArray];
@@ -121,7 +124,10 @@ function check(theirs, yours) {
 	yourLetterIdx < yoursArray[wordIdx].length;
 	yourLetterIdx++
       ) {
-	if (theirs[wordIdx][letterIdx] === yoursArray[wordIdx][yourLetterIdx]) {
+	if (
+	  (theirs[wordIdx][letterIdx] === yoursArray[wordIdx][yourLetterIdx])
+	    && (answer[wordIdx][letterIdx] === "⬛")
+	) {
 	  answer[wordIdx][letterIdx] = "🟨";
 	  yoursArray[wordIdx][yourLetterIdx] = null;
 	  break;
@@ -137,7 +143,10 @@ function check(theirs, yours) {
 	yourWordIdx < yoursArray.length;
 	yourWordIdx++
       ) {
-	if (theirs[wordIdx][letterIdx] === yoursArray[yourWordIdx][letterIdx]) {
+	if (
+	  (theirs[wordIdx][letterIdx] === yoursArray[yourWordIdx][letterIdx])
+	    && (answer[wordIdx][letterIdx] === "⬛")
+	) {
 	  answer[wordIdx][letterIdx] = "🟦";
 	  yoursArray[yourWordIdx][letterIdx] = null;
 	  break;
