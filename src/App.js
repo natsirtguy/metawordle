@@ -2,9 +2,11 @@ import React  from 'react';
 import { useState } from 'react';
 
 export default function Form() {
-  const [yourBoard, setYourBoard] = useState('');
-  const [theirBoard, setTheirBoard] = useState('');
-  const [answer, setAnswer] = useState('');
+  const [yourBoard, setYourBoard] = useState("");
+  const [theirBoard, setTheirBoard] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [yourCode, setYourCode] = useState("");
+  const [theirCode, setTheirCode] = useState("");
   return (
     <React.Fragment>
       <h1>Metawordle</h1>
@@ -16,7 +18,37 @@ export default function Form() {
           onChange={e => setYourBoard(e.target.value)}
         />
       </label>
+      <button onClick={() => setYourCode(boardToCode(yourBoard))}>
+        Generate shareable code
+      </button>
+      {yourBoard !== "" && yourCode !== "" &&
+       <div>
+	 <p style={{ whiteSpace: "pre-wrap" }}>{yourCode}</p>
+	 <br/>
+	 <button onClick={() => {navigator.clipboard.writeText(yourCode)}}>
+           Copy code to clipboard
+	 </button>
+       </div>
+      }
       <br/>
+      <label>
+        Code to guess:
+        <textarea
+	  rows="6"
+          value={theirCode}
+          onChange={e => setTheirCode(e.target.value)}
+        />
+      </label>
+      <hr/>
+      <label>
+        From code:
+	{theirCode !== "" &&
+	 <div>
+	   <p style={{ whiteSpace: "pre-wrap" }}>{codeToBoard(theirCode)}</p>
+	   <br/>
+	 </div>
+	}
+      </label>
       <hr/>
       <label>
         Their guesses of your guesses:
@@ -33,9 +65,9 @@ export default function Form() {
         Check
       </button>
       <br/>
-      {yourBoard !== '' && theirBoard !== '' &&
+      {yourBoard !== "" && theirBoard !== "" &&
        <div>
-	 <p style={{ whiteSpace: 'pre-wrap' }}>{answer}</p>
+	 <p style={{ whiteSpace: "pre-wrap" }}>{answer}</p>
 	 <br/>
 	 <button onClick={() => {navigator.clipboard.writeText(answer)}}>
            Copy to clipboard
@@ -75,6 +107,47 @@ function boardToString(board) {
     answer += "\n";
   }
   return answer.trim()
+}
+
+function boardToCode(board) {
+  board = board.trim().toLowerCase().split("\n");
+  let code = "";
+  // Use a random seed to make it harder to recognize numbers. Pad with zeros.
+  let seed = Math.floor(Math.random() * 100);
+  code += ("00" + String(seed)).slice(-3);
+
+  for (let word of board) {
+    code += "\n"
+    for (let letter of word) {
+      seed += letter.charCodeAt(0)
+      seed %= 1000
+      code += (
+	"0" + String(seed) + "|"
+      ).slice(-4);
+    }
+    code = code.slice(0, -1);
+  }
+
+  return code;
+}
+
+function codeToBoard(code) {
+  code = code.split("\n");
+  var board = new Array(code.length - 1);
+  let seed = Number(code[0]);
+  for (let i = 1; i < code.length; i++) {
+    var word = "";
+    let wordCode = code[i];
+    let charCodes = wordCode.split("|");
+    for (let charCode of charCodes) {
+      console.log(charCode);
+      word += String.fromCharCode((charCode - seed) % 1000);
+      seed += charCode;
+      seed %= 1000;
+    }
+    board[i] = word;
+  }
+  return board;
 }
 
 function check(theirs, yours) {
