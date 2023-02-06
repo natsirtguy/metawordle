@@ -9,11 +9,14 @@ export default function Form() {
   const [yourCode, setYourCode] = useState("");
   const [theirCode, setTheirCode] = useState("");
   const [yourGuess, setYourGuess] = useState("");
-  const [history, setHistory] = useState([Array(6).fill(null)])
+  const [history, setHistory] = useState([Array(6).fill(null)]);
+  const [guessHistory, setGuessHistory] = useState([Array(6).fill(null)]);
   const [turn, setTurn] = useState(0);
 
   function addGuess(turn, history, yourGuess, theirCode) {
     history[turn] = check(yourGuess, boardToString(codeToBoard(theirCode)));
+    guessHistory[turn] = yourGuess;
+    setGuessHistory(guessHistory);
     setHistory(history);
     setTurn(turn + 1);
   }
@@ -70,7 +73,7 @@ export default function Form() {
 	<br/>
 	{turn !== 0 &&
 	 <div>
-	   <p style={{ whiteSpace: "pre-wrap" }}>{historyToString(history)}</p>
+	   <p style={{ whiteSpace: "pre-wrap" }}>{historyToStringWithGuess(history, guessHistory)}</p>
 	   <br/>
 	   <button onClick={() => {navigator.clipboard.writeText(historyToString(history))}}>
              Copy to clipboard
@@ -125,7 +128,7 @@ export default function Form() {
         />
 	<br/>
       </label>
-      <button onClick={() => setAnswer(check(theirBoard, yourBoard))}>
+    <button onClick={() => setAnswer(boardToString(check(theirBoard, yourBoard)))}>
         Check
       </button>
       <br/>
@@ -181,8 +184,27 @@ function historyToString(history) {
       return answer.trim();
     }
     answer += "Round " + String(i) + "\n";
-    answer += history[i];
+    answer += boardToString(history[i]);
     answer += "\n";
+  }
+  return answer.trim();
+}
+
+function historyToStringWithGuess(history, guessHistory) {
+  let answer = "";
+  for (let i = 0; i < history.length; i++) {
+    if (history[i] === null) {
+      return answer.trim();
+    }
+    answer += "Round " + String(i) + "\n";
+    let guessWords = guessHistory[i].trim().toUpperCase().split("\n");
+    for (let j = 0; j < history[i].length; j++) {
+      let word = history[i][j];
+      for (let letter of word) {
+	answer += letter;
+      }
+      answer += " " + guessWords[j] + "\n";
+    }
   }
   return answer.trim();
 }
@@ -371,5 +393,5 @@ function check(theirs, yours) {
     }
   }
 
-  return boardToString(answer);
+  return answer;
 }
