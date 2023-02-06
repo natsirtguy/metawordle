@@ -11,7 +11,7 @@
   },
   "name": "Metawordle",
   "description": "A game to guess Wordle guesses",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "homepage": "https://natsirtguy.github.io/metawordle",
   "scripts": {
     "predeploy": "npm run build",
