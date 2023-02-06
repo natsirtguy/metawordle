@@ -5,23 +5,83 @@ export default function Form() {
   const [yourBoard, setYourBoard] = useState("");
   const [theirBoard, setTheirBoard] = useState("");
   const [answer, setAnswer] = useState("");
+  const [yourBoardToShare, setYourBoardToShare] = useState("");
   const [yourCode, setYourCode] = useState("");
   const [theirCode, setTheirCode] = useState("");
+  const [yourGuess, setYourGuess] = useState("");
+  const [history, setHistory] = useState([Array(6).fill(null)])
+  const [turn, setTurn] = useState(0);
+
+  function addGuess(turn, history, yourGuess, theirCode) {
+    history[turn] = check(yourGuess, boardToString(codeToBoard(theirCode)));
+    setHistory(history);
+    setTurn(turn + 1);
+  }
+
   return (
     <React.Fragment>
       <h1>Metawordle</h1>
+      <h2>Play with a shared code</h2>
       <label>
-        Your Wordle guesses:
+        Code from a friend
+	<br/>
         <textarea
-	  rows="6"
-          value={yourBoard}
-          onChange={e => setYourBoard(e.target.value)}
+	  rows="7"
+          value={theirCode}
+          onChange={e => setTheirCode(e.target.value)}
         />
       </label>
-      <button onClick={() => setYourCode(boardToCode(yourBoard))}>
+      <br/>
+      {theirCode !== "" &&
+       <div>
+	 <label>
+	   Results of their Wordle game
+	   <br/>
+	   <p style={{ whiteSpace: "pre-wrap" }}>{wordleCheck(codeToBoard(theirCode))}</p>
+	   <h3>{lastWord(codeToBoard(theirCode))}</h3>
+	 </label>
+       </div>
+      }
+      <br/>
+      <label>
+        Your guess of their guesses
+	<br/>
+        <textarea
+	  rows="6"
+          value={yourGuess}
+          onChange={e => setYourGuess(e.target.value)}
+        />
+	<br/>
+	<button onClick={() => addGuess(turn, history, yourGuess, theirCode)}>
+          Guess
+	</button>
+	<br/>
+	{turn !== 0 &&
+	 <div>
+	   <p style={{ whiteSpace: "pre-wrap" }}>{historyToString(history)}</p>
+	   <br/>
+	   <button onClick={() => {navigator.clipboard.writeText(historyToString(history))}}>
+             Copy to clipboard
+	   </button>
+	 </div>
+	}
+      </label>
+      <hr/>
+      <h2>Share code</h2>
+      <label>
+        Your Wordle guesses
+	<br/>
+        <textarea
+	  rows="6"
+          value={yourBoardToShare}
+          onChange={e => setYourBoardToShare(e.target.value)}
+        />
+      </label>
+      <br/>
+      <button onClick={() => setYourCode(boardToCode(yourBoardToShare))}>
         Generate shareable code
       </button>
-      {yourBoard !== "" && yourCode !== "" &&
+      {yourBoardToShare !== "" && yourCode !== "" &&
        <div>
 	 <p style={{ whiteSpace: "pre-wrap" }}>{yourCode}</p>
 	 <br/>
@@ -30,37 +90,29 @@ export default function Form() {
 	 </button>
        </div>
       }
-      <br/>
+      <hr/>
+      <h2>Guess checker</h2>
       <label>
-        Code to guess:
+        Your Wordle guesses
+	<br/>
         <textarea
 	  rows="6"
-          value={theirCode}
-          onChange={e => setTheirCode(e.target.value)}
+          value={yourBoard}
+          onChange={e => setYourBoard(e.target.value)}
         />
+	<br/>
       </label>
-      <hr/>
       <label>
-        From code:
-	{theirCode !== "" &&
-	 <div>
-	   <p style={{ whiteSpace: "pre-wrap" }}>{codeToBoard(theirCode)}</p>
-	   <br/>
-	 </div>
-	}
-      </label>
-      <hr/>
-      <label>
-        Their guesses of your guesses:
+        Their guesses of your guesses
+	<br/>
         <textarea
 	  type="textarea"
 	  rows="6"
           value={theirBoard}
           onChange={e => setTheirBoard(e.target.value)}
         />
+	<br/>
       </label>
-      <br/>
-      <hr/>
       <button onClick={() => setAnswer(check(theirBoard, yourBoard))}>
         Check
       </button>
@@ -100,13 +152,27 @@ function purpleInner(letter, wordIdx, letterIdx, yoursArray, answer) {
 
 function boardToString(board) {
   let answer = "";
-  for (let word of board) {
-    for (let letter of word) {
-      answer += letter;
+  for (let i = 0; i < board.length; i++) {
+    let word = board[i];
+    for (let j = 0; j < word.length; j++) {
+      answer += word[j];
     }
     answer += "\n";
   }
-  return answer.trim()
+  return answer.trim();
+}
+
+function historyToString(history) {
+  let answer = "";
+  for (let i = 0; i < history.length; i++) {
+    if (history[i] === null) {
+      return answer.trim();
+    }
+    answer += "Round " + String(i) + "\n";
+    answer += history[i];
+    answer += "\n";
+  }
+  return answer.trim();
 }
 
 function boardToCode(board) {
@@ -131,23 +197,76 @@ function boardToCode(board) {
   return code;
 }
 
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}
+
 function codeToBoard(code) {
-  code = code.split("\n");
+  code = code.trim().split("\n");
   var board = new Array(code.length - 1);
   let seed = Number(code[0]);
-  for (let i = 1; i < code.length; i++) {
-    var word = "";
-    let wordCode = code[i];
+  for (let i = 0; i < code.length - 1; i++) {
+    var word = new Array(5);
+    let wordCode = code[i + 1];
     let charCodes = wordCode.split("|");
-    for (let charCode of charCodes) {
-      console.log(charCode);
-      word += String.fromCharCode((charCode - seed) % 1000);
-      seed += charCode;
+    for (let j = 0; j < 5; j++) {
+      word[j] = String.fromCharCode(mod((charCodes[j] - seed), 1000));
+      seed += charCodes[j];
       seed %= 1000;
     }
     board[i] = word;
   }
   return board;
+}
+function lastWord(board) {
+  try {
+    var last = "";
+    for (let letter of board[board.length - 1]) {
+      last += letter;
+    }
+    return last.toUpperCase();
+  }
+  catch (err) {
+    return "";
+  }
+}
+
+function wordleCheck(board) {
+  try {
+    var correct = board[board.length - 1];
+    var answer = new Array(board.length);
+    for (let i = 0; i < answer.length; i++) {
+      answer[i] = checkWord(board[i], correct);
+    }
+    return boardToString(answer);
+  }
+  catch (err) {
+    return "";
+  }
+}
+
+function checkWord(guess, correct) {
+  var squares = Array(5).fill("⬛");
+  var correctArray = [...correct];
+  for (let i = 0; i < 5; i++) {
+    if (guess[i] === correct[i]) {
+      squares[i] = "🟩";
+      correctArray[i] = null;
+    }
+  }
+  for (let letterIdx = 0; letterIdx < 5; letterIdx++) {
+    for (let correctLetterIdx = 0; correctLetterIdx < 5; correctLetterIdx++) {
+      if (
+	(guess[letterIdx] === correctArray[correctLetterIdx])
+	  && (squares[letterIdx] === "⬛")
+      ) {
+	squares[letterIdx] = "🟨";
+	correctArray[correctLetterIdx] = null;
+	break;
+      }
+    }
+  }
+  return squares;
 }
 
 function check(theirs, yours) {
