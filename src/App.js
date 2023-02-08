@@ -214,15 +214,15 @@ function boardToCode(board) {
   let code = "";
   // Use a random seed to make it harder to recognize numbers. Pad with zeros.
   let seed = Math.floor(Math.random() * 100);
-  code += ("00" + String(seed)).slice(-3);
+  code += ("000" + String(seed)).slice(-3);
 
   for (let word of board) {
-    code += "\n"
+    code += "\n";
     for (let letter of word) {
-      seed += letter.charCodeAt(0)
-      seed %= 1000
+      seed += letter.charCodeAt(0);
+      seed %= 1000;
       code += (
-	"0" + String(seed) + "|"
+	"000" + String(seed) + "|"
       ).slice(-4);
     }
     code = code.slice(0, -1);
