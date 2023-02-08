@@ -26,16 +26,15 @@ export default function Form() {
       <h1>Metawordle</h1>
       <h2>Instructions</h2>
       <p>The goal of Metawordle is to guess what someone else guessed in Wordle!</p>
-      <p>To play, have a friend play a game of Wordle. After they're done, have them type the guesses they made in <b>Share code</b> section below and select <b>Generate shareable code</b>. Have them share the code with you, then paste the code in the <b>Code from a friend</b> box. Try to guess what they tried during their full Wordle game by typing in your guess in the <b>Your guesses of their guesses</b> box and selecting <b>Guess</b>! Make sure to include your guess of all the words from their game including the last. Once you've entered your guess, you'll see which letters you guessed correctly according to this key:
-	<ul>
-	  <li>⬛ means that this letter didn't show up anywhere in your friend's game. Keep trying!</li>
-	  <li>🟩 means you guessed the correct letter. Good job!</li>
-	  <li>🟨 means this letter is somewhere in the same row in your friend's game, excluding the green squares.</li>
-	  <li>🟦 means this letter is somewhere in the same column in your friend's game, excluding the green squares.</li>
-	  <li>🟪 means this letter is somewhere in the non-green squares in your friend's game, but not the same column or row.</li>
-	</ul>
-    Have fun!
-      </p>
+      <p>To play, have a friend play a game of Wordle. After they're done, have them type the guesses they made in <b>Share code</b> section below and select <b>Generate shareable code</b>. Have them share the code with you, then paste the code in the <b>Code from a friend</b> box. Try to guess what they tried during their full Wordle game by typing in your guess in the <b>Your guesses of their guesses</b> box and selecting <b>Guess</b>! Make sure to include your guess of all the words from their game including the last. Once you've entered your guess, you'll see which letters you guessed correctly according to this key:</p>
+      <ul>
+        <li><span role="img" aria-label="Black square">⬛</span> means that this letter didn't show up anywhere in your friend's game. Keep trying!</li>
+	<li><span role="img" aria-label="Black square">🟩</span> means you guessed the correct letter. Good job!</li>
+	<li><span role="img" aria-label="Black square">🟨</span> means this letter is somewhere in the same row in your friend's game, excluding the green squares.</li>
+        <li><span role="img" aria-label="Black square">🟦</span> means this letter is somewhere in the same column in your friend's game, excluding the green squares.</li>
+	<li><span role="img" aria-label="Black square">🟪</span> means this letter is somewhere in the non-green squares in your friend's game, but not the same column or row.</li>
+      </ul>
+      <p>Have fun!</p>
       <h2>Play with a shared code</h2>
       <label>
         Code from a friend
